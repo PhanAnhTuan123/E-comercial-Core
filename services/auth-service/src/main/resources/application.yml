@@ -1,0 +1,67 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/user_service
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  sql:
+    init:
+      mode: never
+  profiles:
+    active: dev
+  config:
+    import: vault://
+  cloud:
+    consul:
+      host: ${CONSUL_HOST}
+      port: ${CONSUL_PORT}
+      discovery:
+        instance-id: ${spring.application.name}:${random.value}
+        health-check-path: /actuator/health
+        health-check-interval: 30s
+        acl-token: ${CONSUL_TOKEN}
+        fail-fast: false
+        prefer-ip-address: true
+        query-passing: true
+    vault:
+      kv:
+        enabled: true
+        default-context: ${spring.application.name}
+        backend: anhTuan
+      authentication: token
+      token: ${VAULT_TOKEN:hvs.oRQnuUvCLMPYf1UQw0cEW3Yb}
+      scheme: ${VAULT_SCHEME:http}
+      host: ${VAULT_HOST:localhost}
+      port: ${VAULT_PORT:8200}
+    function:
+      definition: handleDebitBalanceCommand
+    stream:
+      bindings:
+        handleDebitBalanceCommand-in-0:
+          destination: debit-balance-topic
+        handleDebitBalanceCommand-out-0:
+          destination: debit-balance-reply-topic
+
+
+logging:
+  level:
+    web: trace
+    org.hibernate.orm.jdbc.bind: trace
+    net.ttddyy.dsproxy.listener: debug
+
