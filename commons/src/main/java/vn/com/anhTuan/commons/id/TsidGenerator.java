@@ -13,7 +13,7 @@ public class TsidGenerator implements IdentifierGenerator {
 
     @Override
     public Object generate(SharedSessionContractImplementor sharedSessionContractImplementor, Object o) {
-        return null;
+        return tsidFactory.create().toLong();
     }
 
     public static class TsidFactorySup implements Supplier<TsidFactory> {
@@ -22,7 +22,6 @@ public class TsidGenerator implements IdentifierGenerator {
         private final int datacenter = 1;
         private final int worker = 1;
         private final int node = (datacenter << 3) | worker;
-
         private final TsidFactory tsidFactory = TsidFactory.builder()
                 .withRandomFunction(byte[]::new)
                 .withCustomEpoch(Instant.ofEpochMilli(1732924800000L))
