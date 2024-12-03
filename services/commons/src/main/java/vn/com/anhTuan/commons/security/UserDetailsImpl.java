@@ -1,11 +1,15 @@
 package vn.com.anhTuan.commons.security;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
 
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
     private Long id;
