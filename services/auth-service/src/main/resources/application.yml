@@ -59,6 +59,7 @@ spring:
           destination: debit-balance-reply-topic
 
 
+
 logging:
   level:
     web: trace
