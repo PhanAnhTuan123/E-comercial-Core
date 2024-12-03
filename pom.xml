@@ -10,8 +10,8 @@
 <!--  <url>http://maven.apache.org</url>-->
 
   <modules>
-    <module>commons</module>
-    <module>auth-service</module>
+    <module>services/commons</module>
+    <module>services/auth-service</module>
   </modules>
 
 
