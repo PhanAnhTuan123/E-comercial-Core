@@ -29,7 +29,7 @@ import java.util.Set;
 public class OAuth2PasswordGrantAuthenticationProvider implements AuthenticationProvider {
 
     private final OAuth2AuthorizationService authorizationService;
-    private final OAuth2TokenGenerator<? extends OAuth2Utils> tokenGenerator;
+    private final OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator;
     private final AuthenticationManager authenticationManager;
 
     @Override
