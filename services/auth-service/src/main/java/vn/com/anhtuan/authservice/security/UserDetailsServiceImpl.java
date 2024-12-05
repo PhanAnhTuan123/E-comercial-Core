@@ -1,4 +1,4 @@
-package vn.com.anhtuan.authservice.service;
+package vn.com.anhtuan.authservice.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findOneByUsernameWithRoles(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
         List<GrantedAuthority> authorities = new ArrayList<>();
         user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getCode())));
         return new UserDetailsImpl(
@@ -32,6 +32,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 user.getPassword(),
                 authorities
         );
-
     }
 }

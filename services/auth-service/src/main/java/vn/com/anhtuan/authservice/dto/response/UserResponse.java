@@ -2,13 +2,14 @@ package vn.com.anhtuan.authservice.dto.response;
 
 
 import lombok.Builder;
+import lombok.With;
 import org.springframework.lang.Nullable;
 import vn.com.anhTuan.commons.enumeration.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
-
+@With
 public record UserResponse (
         String id,
         Instant createdAt,
@@ -41,12 +42,13 @@ public record UserResponse (
             BigDecimal total,
             OrderStatus status,
             List<OrderItemResponse> items
-    ) {}
+    ) {
 
     @Builder
-    public record OrderItemResponse (
+    public static record OrderItemResponse (
             String id,
             Long quantity
     ) {}
 
+    }
 }

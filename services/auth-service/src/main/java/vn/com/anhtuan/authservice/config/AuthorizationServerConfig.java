@@ -193,8 +193,6 @@ public class AuthorizationServerConfig {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public DefaultSecurityFilterChain authorizationSecurityFilterChain(HttpSecurity http) throws Exception {
-//        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-
         OAuth2AuthorizationServerConfigurer auth2AuthorizationServerConfigurer =
                 http.getConfigurer(OAuth2AuthorizationServerConfigurer.class);
 
@@ -231,7 +229,6 @@ public class AuthorizationServerConfig {
                 .build();
         JWKSet jwtSet = new JWKSet(rsaKey);
         return new ImmutableJWKSet<>(jwtSet);
-
     }
 
     private static KeyPair generateRsaKey() throws NoSuchAlgorithmException {

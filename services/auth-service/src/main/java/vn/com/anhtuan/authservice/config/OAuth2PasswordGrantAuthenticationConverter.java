@@ -20,6 +20,7 @@ import java.util.Set;
  * Converter for OAuth2 password grant type. This converter is used to convert a request to an authentication object.
  * Spring Authorization Server does not provide a converter for this grant type. So we have to implement it on our own.
  */
+
 public class OAuth2PasswordGrantAuthenticationConverter implements AuthenticationConverter {
 
     public static final AuthorizationGrantType PASSWORD = new AuthorizationGrantType("password");
