@@ -12,8 +12,7 @@
   <modules>
     <module>services/commons</module>
     <module>services/auth-service</module>
+    <module>services/gateway-service</module>
   </modules>
-
-
 
 </project>

@@ -1,6 +1,7 @@
 package vn.com.anhTuan.commons.security;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
-
+    @Getter
     private Long id;
     private String username;
     private String password;
