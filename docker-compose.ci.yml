@@ -1,0 +1,101 @@
+version: '3.8'
+
+name: ci-server
+
+services:
+  docker-daemon:
+    container_name: docker-daemon
+    image: docker:dind
+    privileged: true
+    restart: always
+    command: --storage-driver overlay2
+    volumes:
+      - jenkins-docker-certs:/certs/client
+      - jenkins-data:/var/jenkins_home
+      - docker-data:/var/lib/docker
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+    ports:
+      - "2376:2376"
+    networks:
+      ci:
+        aliases:
+          - docker
+
+  jenkins-server:
+    container_name: jenkins-server
+    restart: always
+    depends_on:
+      docker-daemon:
+        condition: service_started
+    build:
+      context: ./docker/jenkins
+      dockerfile: Dockerfile
+    volumes:
+      - jenkins-docker-certs:/certs/client:ro
+      - jenkins-data:/var/jenkins_home
+    environment:
+      - DOCKER_HOST=tcp://docker:2376
+      - DOCKER_CERT_PATH=/certs/client
+      - DOCKER_TLS_VERIFY=1
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    networks:
+      - ci
+
+  sonarqube-server:
+    container_name: sonarqube-server
+    image: sonarqube:9.9.6-community
+    restart: always
+    volumes:
+      - sonarqube-data:/opt/sonarqube/data
+      - sonarqube-logs:/opt/sonarqube/logs
+      - sonarqube-extensions:/opt/sonarqube/extensions
+    ports:
+      - "9000:9000"
+    networks:
+      - ci
+
+  nexus-repository:
+    container_name: nexus-repository
+    image: sonatype/nexus3:3.71.0-alpine
+    restart: always
+    volumes:
+      - nexus-data:/nexus-data
+    ports:
+      - "8081:8081"
+    networks:
+      - ci
+
+  reposilite-repository:
+    image: dzikoysk/reposilite:3.5.14
+    container_name: reposilite
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - reposilite-data:/app/data
+
+volumes:
+  jenkins-docker-certs:
+    driver: local
+  jenkins-data:
+    driver: local
+  docker-data:
+    driver: local
+  sonarqube-data:
+    driver: local
+  sonarqube-logs:
+    driver: local
+  sonarqube-extensions:
+    driver: local
+  nexus-data:
+    driver: local
+  reposilite-data:
+    driver: local
+
+
+networks:
+  ci:
+    driver: bridge
