@@ -1,0 +1,35 @@
+version: '3.8'
+
+name: anhtuan-monitor
+
+services:
+  anhtuan-monitor-prometheus:
+    container_name: anhtuan-monitor-prometheus
+    image: prom/prometheus:v2.48.1
+    restart: always
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      - anhtuan-network
+
+  anhtuan-monitor-grafana:
+    container_name: anhtuan-monitor-grafana
+    image: grafana/grafana:10.2.2
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - anhtuan-network
+
+volumes:
+  prometheus:
+    driver: local
+
+networks:
+  anhtuan-network:
+    external: true
