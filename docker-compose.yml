@@ -1,0 +1,133 @@
+version: '3.8'
+
+name: genesis
+
+services:
+    anhtuan-auth-service:
+      container_name: anhtuan-auth-service
+      image: anhtuan-auth-service
+      restart: unless-stopped
+      build:
+        context: ./auth-service
+        dockerfile: Dockerfile
+        args:
+          SERVICE_NAME: auth-service
+      environment:
+        SPRING_PROFILES_ACTIVE: prod
+        VAULT_HOST: anhtuan-infra-vault
+        VAULT_SCHEME: http
+        VAULT_PORT: 8200
+        VAULT_TOKEN: hvs.isQWVE78RwdY0UW5is4SjIng
+      healthcheck:
+        interval: 30s
+        retries: 10
+        test: [ "CMD-SHELL", "curl --fail --silent http://localhost:8000/actuator/health" ]
+      ports:
+        - "8000:8000"
+      networks:
+        - anhtuan-network
+
+    anhtuan-gateway-service:
+      container_name: anhtuan-gateway-service
+      image: anhtuan-gateway-service
+      restart: unless-stopped
+      build:
+        context: ./gateway-service
+        dockerfile: Dockerfile
+        args:
+          SERVICE_NAME: gateway-service
+      environment:
+        SPRING_PROFILES_ACTIVE: prod
+        VAULT_HOST: anhtuan-infra-vault
+        VAULT_SCHEME: http
+        VAULT_PORT: 8200
+        VAULT_TOKEN: hvs.isQWVE78RwdY0UW5is4SjIng
+      healthcheck:
+        interval: 30s
+        retries: 10
+        test: [ "CMD-SHELL", "curl --fail --silent http://localhost:8080/actuator/health" ]
+      depends_on:
+        anhtuan-auth-service:
+          condition: service_healthy
+      ports:
+        - "8080:8080"
+      networks:
+        - anhtuan-network
+
+    anhtuan-order-service:
+      container_name: anhtuan-order-service
+      image: anhtuan-order-service
+      restart: unless-stopped
+      build:
+        context: ./order-service
+        dockerfile: Dockerfile
+        args:
+          SERVICE_NAME: order-service
+      environment:
+        SPRING_PROFILES_ACTIVE: prod
+        VAULT_HOST: anhtuan-infra-vault
+        VAULT_SCHEME: http
+        VAULT_PORT: 8200
+        VAULT_TOKEN: hvs.isQWVE78RwdY0UW5is4SjIng
+      ports:
+        - "8020:8020"
+      networks:
+        - anhtuan-network
+
+    anhtuan-product-service:
+      container_name: anhtuan-product-service
+      image: anhtuan-product-service
+      restart: unless-stopped
+      build:
+        context: ./product-service
+        dockerfile: Dockerfile
+        args:
+          SERVICE_NAME: product-service
+      environment:
+        SPRING_PROFILES_ACTIVE: prod
+        VAULT_HOST: anhtuan-infra-vault
+        VAULT_SCHEME: http
+        VAULT_PORT: 8200
+        VAULT_TOKEN: hvs.isQWVE78RwdY0UW5is4SjIng
+      ports:
+        - "8010:8010"
+      networks:
+        - anhtuan-network
+
+    anhtuan-query-service:
+      container_name: anhtuan-query-service
+      image: anhtuan-query-service
+      restart: unless-stopped
+      build:
+        context: ./query-service
+        dockerfile: Dockerfile
+        args:
+          SERVICE_NAME: query-service
+      environment:
+        SPRING_PROFILES_ACTIVE: prod
+        VAULT_HOST: anhtuan-infra-vault
+        VAULT_SCHEME: http
+        VAULT_PORT: 8200
+        VAULT_TOKEN: hvs.isQWVE78RwdY0UW5is4SjIng
+      ports:
+        - "8030:8030"
+      networks:
+        - anhtuan-network
+
+#  anhtuan-dummy-service:
+#    container_name: anhtuan-dummy-service
+#    image: anhtuan-dummy-service
+#    restart: unless-stopped
+#    build:
+#      context: ./dummy-service
+#      dockerfile: Dockerfile
+#      args:
+#        SERVICE_NAME: query-service
+#    ports:
+#      - "9090:9090"
+#    networks:
+#      - anhtuan-network
+
+networks:
+  anhtuan-network:
+    external: true
