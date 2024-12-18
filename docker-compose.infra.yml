@@ -1,0 +1,107 @@
+version: '3.8'
+
+name: anhtuan-infra
+
+services:
+  anhtuan-infra-postgres:
+    container_name: anhtuan-infra-postgres
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: quangduong
+      POSTGRES_PASSWORD: 292003
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker/postgres/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - anhtuan-network
+
+  anhtuan-infra-rabbitmq:
+    image: rabbitmq:3.12.7-management-alpine
+    container_name: anhtuan-infra-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: quangduong
+      RABBITMQ_DEFAULT_PASS: 292003
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+    networks:
+      - anhtuan-network
+
+  anhtuan-infra-redis:
+    image: redis:7.2.5
+    container_name: anhtuan-infra-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis:/data
+    networks:
+      - anhtuan-network
+
+  anhtuan-infra-consul:
+    image: hashicorp/consul:1.14
+    container_name: anhtuan-infra-consul
+    restart: always
+    ports:
+      - "8500:8500"
+      - "8600:8600/tcp"
+      - "8600:8600/udp"
+    volumes:
+      - consul:/consul/data
+      - ./docker/consul/acl.json:/consul/config/acl.json
+    command: "agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0"
+    networks:
+      - anhtuan-network
+
+  anhtuan-infra-vault:
+    image: hashicorp/vault:1.15
+    container_name: anhtuan-infra-vault
+    hostname: vault
+    restart: always
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200"
+      VAULT_API_ADDR: "http://0.0.0.0:8200"
+      VAULT_LOCAL_CONFIG: '{"storage": {"file": {"path": "/vault/file"}}, "listener": [{"tcp": { "address": "0.0.0.0:8200", "tls_disable": true}}], "default_lease_ttl": "168h", "max_lease_ttl": "720h", "ui": true}'
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - vault-file:/vault/file
+      - vault-log:/vault/log
+      - vault-logs:/vault/logs
+    command: "server"
+    networks:
+      - anhtuan-network
+
+  anhtuan-infra-zipkin:
+    container_name: anhtuan-infra-zipkin
+    image: openzipkin/zipkin:3
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+    networks:
+      - anhtuan-network
+
+volumes:
+  postgres:
+    driver: local
+  rabbitmq:
+    driver: local
+  consul:
+    driver: local
+  redis:
+    driver: local
+  vault-file:
+    driver: local
+  vault-log:
+    driver: local
+  vault-logs:
+    driver: local
+
+networks:
+  anhtuan-network:
+    external: true
