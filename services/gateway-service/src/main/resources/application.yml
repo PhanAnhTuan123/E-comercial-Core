@@ -13,3 +13,88 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${ISSUER_URI}
+  cloud:
+       consul:
+         host: ${CONSUL_HOST}
+         port: ${CONSUL_PORT}
+         discovery:
+           instance-id: ${spring.application.name}:${random.value}
+           health-check-path: /actuator/health
+           health-check-interval: 30s
+           acl-token: ${CONSUL_TOKEN}
+           fail-fast: false
+           prefer-ip-address: true
+           query-passing: true
+       vault:
+        kv:
+          enabled: true
+          default-context: ${spring.application.name}
+          backend: anhTuan
+        authentication: token
+        token: ${VAULT_TOKEN:hvs.oRQnuUvCLMPYf1UQw0cEW3Yb}
+        scheme: ${VAULT_SCHEME:http}
+        host: ${VAULT_HOST:localhost}
+        port: ${VAULT_PORT:8200}
+       gateway:
+         routes:
+           - id: auth-service
+             uri: lb://auth-service
+             predicates:
+               - Path=/api/oauth2/**, /api/auth/signup, /api/users/**
+             filters:
+               - RewritePath=/api/oauth2/(?<segment>.*), /oauth2/$\{segment}
+               - RewritePath=/api/auth/signup, /signup
+               - RewritePath=/api/users, /users
+           - id: product
+             uri: lb://product-service
+             predicates:
+               - Path=/api/products/**
+             filters:
+               - RewritePath=/api/products, /product/products
+               - RewritePath=/api/products/(?<segment>.*), /product/products/$\{segment}
+           - id: category
+             uri: lb://product-service
+             predicates:
+               - Path=/api/categories/**
+             filters:
+               - RewritePath=/api/categories, /product/categories
+               - RewritePath=/api/categories/(?<segment>.*), /product/categories/$\{segment}
+           - id: get-orders
+             uri: lb://query-service
+             predicates:
+               - Method=GET
+               - Path=/api/orders/**
+             filters:
+               - RewritePath=/api/orders, /query/orders
+               - RewritePath=/api/orders/(?<segment>.*), /query/orders/$\{segment}
+           - id: order
+             uri: lb://order-service
+             predicates:
+               - Path=/api/orders/**
+             filters:
+               - RewritePath=/api/orders, /order/orders
+               - RewritePath=/api/orders/(?<segment>.*), /order/orders/$\{segment}
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+
+  zipkin:
+    tracing:
+      endpoint: http://${ZIPKIN_HOST}:${ZIPKIN_PORT}/api/v2/spans
+
+  tracing:
+    sampling:
+      probability: 1.0
+logging:
+  level:
+    root: info
+    org:
+      springframework:
+        security: trace
+        cloud:
+          gateway: trace
