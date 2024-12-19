@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import vn.com.anhTuan.gateway_service.exception.AccessDeniedExceptionHandler;
 import vn.com.anhTuan.gateway_service.exception.AuthenticationExceptionHandler;
