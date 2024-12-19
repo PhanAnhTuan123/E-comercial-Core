@@ -1,0 +1,5 @@
+http.host: '0.0.0.0'
+xpack.monitoring.elasticsearch:
+  hosts: ['anhtuan-infra-elasticsearch:9200']
+  username: elastic
+  password: 'anhtuan'
