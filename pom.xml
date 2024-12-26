@@ -15,6 +15,7 @@
     <module>services/gateway-service</module>
     <module>services/product-service</module>
     <module>services/order-service</module>
+    <module>services/query-service</module>
   </modules>
 
 </project>
