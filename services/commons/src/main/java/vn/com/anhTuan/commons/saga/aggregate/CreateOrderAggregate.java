@@ -1,5 +1,6 @@
 package vn.com.anhTuan.commons.saga.aggregate;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import vn.com.anhTuan.commons.enumeration.OrderStatus;
@@ -17,7 +18,7 @@ public class CreateOrderAggregate {
     private List<OrderItem> items;
 
     @Data
-    @Builder
+    @AllArgsConstructor
     public static class OrderItem {
         private Long id;
         private Long quantity;
